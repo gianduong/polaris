@@ -6,8 +6,8 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents } from "react-leaflet";
 import L from 'leaflet';
 import personFilledMarker from '../assets/person.jpg';
-import { getPaging } from "../api/baseApi"
-import { ToastContainer,toast } from 'react-toastify';
+import { getAll, getPaging } from "../api/baseApi"
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import data from "../utils/data";
 //#region Fomat icon
@@ -92,16 +92,18 @@ function UserList() {
     // Here we use item offsets; we could also use page offsets
     // following the API or data you're working with.
     const [itemOffset, setItemOffset] = useState(0);
-
     useEffect(() => {
-        // Fetch items from another resources.
-        // const pageInt = 1;
-        // const pageSize = 10;
-        // getPaging(pageInt, pageSize).then((res) => {
-        //     users = res.data
-            const endOffset = itemOffset + itemsPerPage;
-            setCurrentItems(users.slice(itemOffset, endOffset));
-            setPageCount(Math.ceil(users.length / itemsPerPage));
+        toast.success("Login thành công!")
+        const pageInt = 1;
+        const pageSize = 10;
+        getPaging(pageInt, pageSize).then((res) => {
+            users = res.data;
+        })
+    }, []);
+    useEffect(() => {
+        const endOffset = itemOffset + itemsPerPage;
+        setCurrentItems(users.slice(itemOffset, endOffset));
+        setPageCount(Math.ceil(users.length / itemsPerPage));
         // })
     }, [itemOffset, itemsPerPage, users]);
 
@@ -110,7 +112,6 @@ function UserList() {
         setItemOffset(newOffset);
     }
     //#endregion
-
     const displayMap = useMemo(
         () => (
             <MapContainer
@@ -118,7 +119,10 @@ function UserList() {
                 center={center}
                 zoom={zoom}
                 scrollWheelZoom={true}
-                whenCreated={setMap}>
+                whenCreated={setMap}
+                on
+            >
+
                 <TileLayer
                     url='http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
                 />
@@ -144,50 +148,50 @@ function UserList() {
     const onClick = useCallback((user) => {
         const userCenter = [user.latitude, user.longitude];
         console.log(user);
-        map.setView(userCenter, 12);
-}, [map])
-return (
-    <div className="map">
-        <ToastContainer />
-        <div className="list-user">
-            <span className="title">Danh sách User</span>
-            <div className="list-User-detail">
-                {currentItems &&
-                    currentItems.map((person) => (
-                        <div className="list-item" onClick={() => onClick(person)} key={person.userId}>
-                            <Avatar customer name="Farrah" />
-                            <span>{person.lastName}</span>
-                        </div>
-                    ))}
-            </div>
-            <div className="pagination-list">
-                <div className="pagination-item">
-                    <ReactPaginate
-                        nextLabel=">"
-                        onPageChange={handlePageClick}
-                        pageRangeDisplayed={1}
-                        pageCount={pageCount}
-                        previousLabel="<"
-                        pageClassName="page-item"
-                        pageLinkClassName="page-link"
-                        previousClassName="page-item"
-                        previousLinkClassName="page-link"
-                        nextClassName="page-item"
-                        nextLinkClassName="page-link"
-                        breakLabel="..."
-                        breakClassName="page-item"
-                        breakLinkClassName="page-link"
-                        containerClassName="pagination"
-                        activeClassName="active"
-                        renderOnZeroPageCount={null}
-                    />
+        map.flyTo(userCenter, map.getZoom());
+    }, [map])
+    return (
+        <div className="map">
+            <ToastContainer />
+            <div className="list-user">
+                <span className="title">Danh sách User</span>
+                <div className="list-User-detail">
+                    {currentItems &&
+                        currentItems.map((person) => (
+                            <div className="list-item" onClick={() => onClick(person)} key={person.userId}>
+                                <Avatar customer name="Farrah" />
+                                <span>{person.lastName}</span>
+                            </div>
+                        ))}
+                </div>
+                <div className="pagination-list">
+                    <div className="pagination-item">
+                        <ReactPaginate
+                            nextLabel=">"
+                            onPageChange={handlePageClick}
+                            pageRangeDisplayed={1}
+                            pageCount={pageCount}
+                            previousLabel="<"
+                            pageClassName="page-item"
+                            pageLinkClassName="page-link"
+                            previousClassName="page-item"
+                            previousLinkClassName="page-link"
+                            nextClassName="page-item"
+                            nextLinkClassName="page-link"
+                            breakLabel="..."
+                            breakClassName="page-item"
+                            breakLinkClassName="page-link"
+                            containerClassName="pagination"
+                            activeClassName="active"
+                            renderOnZeroPageCount={null}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
-        <div className="map-detail">
-            {displayMap}
+            <div className="map-detail">
+                {displayMap}
+            </div >
         </div >
-    </div >
-)
+    )
 }
 export default UserList;
