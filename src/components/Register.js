@@ -144,7 +144,7 @@ function Register() {
                             error={errorPasswordMessage}
                         />
                         <ReCAPTCHA width="254px"
-                            sitekey="6Lcpfj4dAAAAAEtWd_i_t2IzOG3lz0n-ZG9arpSf"
+                            sitekey="6LdBmD4dAAAAAFpLE7KLRy-2o7e7EkAGk9j8vecg"
                             onChange={onChange}
                         />
                         <Button primary onClick={() => Register(user)}>Đăng ký</Button>
