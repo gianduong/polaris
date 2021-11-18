@@ -175,7 +175,7 @@ function Register() {
                         />
                         <ReCAPTCHA width="254px"
                             sitekey="6LfloT4dAAAAAOUmFQt7JQm07ViyI482cZlNAvKG"
-                            onChange={capcha = true}
+                            onChange={() => capcha = true}
                         />
                         <Button primary onClick={() => Register(user)}>Đăng ký</Button>
                     </FormLayout>
