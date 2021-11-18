@@ -41,15 +41,27 @@ function Register() {
 
     //#region rule Input
     const textFieldID = 'ruleContent';
-
+    // biến check điều kiện lỗi
     const isEmailInvalid = isValueEmailInvalid(email);
     const isPasswordInvalid = isValuePasswordInvalid(password);
+    // thông điệp lỗi, chi tiết trong file userMessage
     const errorEmailMessage = isEmailInvalid ? notify.Notify_Email_Error() : '';
     const errorPasswordMessage = isPasswordInvalid ? notify.Notify_Password_Error() : '';
-    
+    /**
+     * Hàm validate password
+     * @param {*} content nội dung 
+     * @returns True: có lỗi, false : không có lỗi 
+     * CreatedBy: NGDuong (14/11/2021)
+     */
     function isValuePasswordInvalid(content) {
         return /[A-Z]/.test(content) && /[0-9]/.test(content) && !/[aeiou]/.test(content) && /^[@#][A-Za-z0-9]{7,13}$/.test(content);
     }
+    /**
+     * Hàm validate Email
+     * @param {*} content content 
+     * @returns True: có lỗi, false : không có lỗi 
+     * CreatedBy: NGDuong (14/11/2021)
+     */
     function isValueEmailInvalid(content) {
         if (content == null || content == "") return false;
         var check = content && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(content) ?
@@ -93,6 +105,9 @@ function Register() {
                 return toast.error(notify.Notify_Eror_500());
             }
         }
+        setTimeout(() => {
+            window.location.href = '/UserList';
+        }, 1000);
     }
     //#endregion
     return (

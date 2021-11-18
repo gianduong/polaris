@@ -87,6 +87,7 @@ function UserList() {
      * cập nhật ?
      */
     useEffect(() => {  
+        setPageCount(Math.ceil(users.length / itemsPerPage)); 
         setCurrentItems(users.slice(itemOffset, itemOffset + itemsPerPage));      
     }, [itemOffset, itemsPerPage]);
 
