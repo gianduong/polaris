@@ -4,11 +4,9 @@ import {
     Layout,
     Page,
     Card,
-    Link,
     Button,
     FormLayout,
     TextField,
-    AccountConnection, Toast, InlineError
 } from '@shopify/polaris';
 import { saveItem } from "../api/baseApi"
 import { ToastContainer, toast } from 'react-toastify';
@@ -20,7 +18,6 @@ function Register() {
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
-
     const handleFirstChange = useCallback((value) => setFirst(value), []);
     const handleLastChange = useCallback((value) => setLast(value), []);
     const handleEmailChange = useCallback((value) => setEmail(value), []);
@@ -53,6 +50,10 @@ function Register() {
             true : false;
         return check;
     }
+    var capcha = false;
+    function autholizeCapcha() {
+        capcha = true;
+    }
     //#endregion
     //#region API
     const Register = (u) => {
@@ -62,6 +63,7 @@ function Register() {
         if(u.last == "" || u.email == "" || u.password == ""){
             return toast.error("Không bỏ trống các ô có chứa hoa thị!");
         }
+        if((!capcha)) return toast.error("Vui lòng xác minh danh tính!");
         else {
             try {
                 saveItem(u)
@@ -144,8 +146,8 @@ function Register() {
                             error={errorPasswordMessage}
                         />
                         <ReCAPTCHA width="254px"
-                            sitekey="6Lcpfj4dAAAAAEtWd_i_t2IzOG3lz0n-ZG9arpSf"
-                            onChange={onChange}
+                            sitekey="6LfloT4dAAAAAOUmFQt7JQm07ViyI482cZlNAvKG"
+                            onChange={autholizeCapcha}
                         />
                         <Button primary onClick={() => Register(user)}>Đăng ký</Button>
                     </FormLayout>
@@ -158,8 +160,6 @@ function Register() {
 }
 
 
-function onChange(value) {
-    console.log("Captcha value:", value);
-}
+
 
 export default Register;
