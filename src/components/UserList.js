@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Avatar } from '@shopify/polaris';
-// import GoogleMapReact from 'google-map-react';
 import ReactPaginate from 'react-paginate';
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents } from "react-leaflet";
 import L from 'leaflet';
 import personFilledMarker from '../assets/person.png';
 import personFilledMarker2 from '../assets/person2.png'
-import { getAll, getPaging } from "../api/baseApi"
+import { getPaging } from "../api/baseApi"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import data from "../utils/data";
-import axios from "axios";
 //#region Fomat icon
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -36,34 +34,7 @@ const personMarker2 = L.icon({
 const center = [51.505, -0.09]
 const zoom = 18
 
-//#region show center
-function DisplayPosition({ map }) {
-    const [position, setPosition] = useState(map.getCenter())
-
-    const onClick = useCallback(() => {
-        map.setView(center, zoom)
-    }, [map])
-
-    const onMove = useCallback(() => {
-        setPosition(map.getCenter())
-    }, [map])
-
-    useEffect(() => {
-        map.on('move', onMove)
-        return () => {
-            map.off('move', onMove)
-        }
-    }, [map, onMove])
-
-    return (
-        <p>
-            latitude: {position.lat.toFixed(4)}, longitude: {position.lng.toFixed(4)}{' '}
-            <button onClick={onClick}>reset</button>
-        </p>
-    )
-}
-//#endregion
-
+//#region location
 function LocationMarker() {
     const [position, setPosition] = useState(null)
     const map = useMapEvents({
@@ -85,20 +56,23 @@ function LocationMarker() {
         </Marker>
     )
 }
+//#endregion
 
 
 function UserList() {
 
-    const [map, setMap] = useState(null)
-    var users = data;
+    const [map, setMap] = useState(null); // bản đồ
+    var users = data; //danh sách User
 
     //#region pagination
-    const [itemsPerPage] = useState(5);
-    const [currentItems, setCurrentItems] = useState(null);
-    const [pageCount, setPageCount] = useState(0);
-    // Here we use item offsets; we could also use page offsets
-    // following the API or data you're working with.
-    const [itemOffset, setItemOffset] = useState(0);
+    const [itemsPerPage] = useState(5); // số lượng phần tử trên một trang
+    const [currentItems, setCurrentItems] = useState(null); // tổng số lượng itema
+    const [pageCount, setPageCount] = useState(0); // tổng số page
+    const [itemOffset, setItemOffset] = useState(0); // vị trí item đầu tiên của page hiện tại
+
+    /**
+     * khi bắt đầu load page
+     */
     useEffect(() => {
         toast.success("Login thành công!")
         const pageInt = 1;
@@ -106,19 +80,33 @@ function UserList() {
         getPaging(pageInt,pageSize).then((res) => {
             users = res.data;
             setPageCount(Math.ceil(users.length / itemsPerPage)); 
-            setCurrentItems(users.slice(itemOffset, itemOffset + itemsPerPage));   
         })
-        return {displayMap}
     }, []);
+
+    /**
+     * cập nhật ?
+     */
     useEffect(() => {  
         setCurrentItems(users.slice(itemOffset, itemOffset + itemsPerPage));      
     }, [itemOffset, itemsPerPage]);
 
+    /**
+     * Hàm thay đổi page
+     * @param {*} event sự kiện thay đổi page
+     */
     const handlePageClick = (event) => {
         const newOffset = event.selected * itemsPerPage % users.length;
         setItemOffset(newOffset);
     }
+    /**
+     * cập nhật vị trí user trên bản đồ 
+     */
+    const onClick = useCallback((user) => {
+        const userCenter = [user.latitude, user.longitude];
+        map.flyTo(userCenter, map.getZoom());
+    }, [map])
     //#endregion
+
     const displayMap = useMemo(
         () => (
             <MapContainer
@@ -127,9 +115,7 @@ function UserList() {
                 zoom={zoom}
                 scrollWheelZoom={true}
                 whenCreated={setMap}
-                on
             >
-
                 <TileLayer
                     url='http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
                 />
@@ -152,10 +138,7 @@ function UserList() {
         ),
         [users],
     )
-    const onClick = useCallback((user) => {
-        const userCenter = [user.latitude, user.longitude];
-        map.flyTo(userCenter, map.getZoom());
-    }, [map])
+    
 
     return (
         <div className="map">
@@ -165,10 +148,11 @@ function UserList() {
                 <div className="list-User-detail">
                     {currentItems &&
                         currentItems.map((person) => (
-                            <div className="list-item" onClick={() => onClick(person)} key={person.userId}>
+                            <div className="list-item btn btn-gradient-border btn-glow" onClick={() => onClick(person)} key={person.userId}>
                                 <Avatar customer name="Farrah" />
-                                <span>{person.lastName}</span>
+                                <span className="text-gradient">{person.firstName + " " + person.lastName}</span>
                                 <span>( {person.address} )</span>
+
                             </div>
                         ))}
                 </div>

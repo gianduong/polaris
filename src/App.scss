@@ -9,7 +9,7 @@ html {
 	height: 100%;
 }
 body {
-	background-color: #eff3f4;
+	background-color: #fff;
 	position: relative;
 	width: 100%;
 	height: 100%;
@@ -39,6 +39,41 @@ body {
 		color-stop(0.72, rgb(73, 125, 189)),
 		color-stop(0.86, rgb(28, 58, 148))
 	);
+}
+// #endregion
+// #region css base
+.text-gradient {
+	background-color: #1d1e22;
+	color: white;
+	font-weight: 600;
+	background: linear-gradient(to right, #30cfd0, #c43ad6);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+:root {
+	/* violet */
+	--primary-color: 111, 76, 255;
+	/* white */
+	--text-color: 256, 256, 256;
+}
+.btn-gradient-border {
+	color: rgba(var(--text-color), 1);
+	border: 2px double transparent;
+	background-image: linear-gradient(rgb(13, 14, 33), rgb(13, 14, 33)),
+		radial-gradient(circle at left top, rgb(1, 110, 218), rgb(217, 0, 192));
+	background-origin: border-box;
+}
+.btn:hover {
+	transition: all 0.3s ease;
+}
+.btn {
+	cursor: pointer;
+	border-radius: 4px;
+	transition: all 0.3s ease;
+	border-radius: 50px;
+}
+.btn-glow:hover {
+	box-shadow: rgba(var(--primary-color), 0.5) 0px 0px 20px 0px;
 }
 // #endregion
 // #region polaris
@@ -93,15 +128,15 @@ body {
 				}
 			}
 		}
-		.pagination-list{
+		.pagination-list {
 			display: flex;
-			justify-content: center;		
+			justify-content: center;
 			margin-right: 25px;
-			border-top: 1px solid #dfc4c4; 
-			span{
+			border-top: 1px solid #dfc4c4;
+			span {
 				margin: auto 0;
 			}
-			.pagination-item{
+			.pagination-item {
 				margin: 0 auto;
 			}
 		}
@@ -110,6 +145,7 @@ body {
 		width: 70%;
 		height: 400px;
 		margin-top: 20px;
+		box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 		.map-container {
 			height: 400px;
 		}

@@ -9,9 +9,11 @@ import {
     TextField,
 } from '@shopify/polaris';
 import { saveItem } from "../api/baseApi"
+import notify from "../utils/userMessage";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 function Register() {
+    //#region Field
     const [first, setFirst] = useState('');
     const [last, setLast] = useState('');
     const [email, setEmail] = useState('');
@@ -33,14 +35,18 @@ function Register() {
         lastname: last,
         email: email
     }
+    var capcha = false;
+    //#endregion
 
 
     //#region rule Input
     const textFieldID = 'ruleContent';
+
     const isEmailInvalid = isValueEmailInvalid(email);
     const isPasswordInvalid = isValuePasswordInvalid(password);
-    const errorEmailMessage = isEmailInvalid ? 'Email không hợp lệ' : '';
-    const errorPasswordMessage = isPasswordInvalid ? 'Password không hợp lệ' : '';
+    const errorEmailMessage = isEmailInvalid ? notify.Notify_Email_Error() : '';
+    const errorPasswordMessage = isPasswordInvalid ? notify.Notify_Password_Error() : '';
+    
     function isValuePasswordInvalid(content) {
         return /[A-Z]/.test(content) && /[0-9]/.test(content) && !/[aeiou]/.test(content) && /^[@#][A-Za-z0-9]{7,13}$/.test(content);
     }
@@ -50,20 +56,27 @@ function Register() {
             true : false;
         return check;
     }
-    var capcha = false;
-    function autholizeCapcha() {
-        capcha = true;
-    }
+    
     //#endregion
     //#region API
+    /**
+     * kiểm tra và điều hướng sự kiện đăng ký
+     * @param {*} u User
+     * @returns 
+     * CreatedBy:NGDuong (14/11/2021)
+     */
     const Register = (u) => {
+        // nhập sai điều kiện
         if (isEmailInvalid == isPasswordInvalid == false) {
-            return toast.warning("Nhập nghiêm túc vào!");
+            return toast.warning(notify.Notify_validate());
         }
+        // nhập thiếu ô cần nhập
         if(u.last == "" || u.email == "" || u.password == ""){
-            return toast.error("Không bỏ trống các ô có chứa hoa thị!");
+            return toast.error(notify.Notify_Data_Empty());
         }
-        if((!capcha)) return toast.error("Vui lòng xác minh danh tính!");
+        // nhập sai capcha
+        if((!capcha)) return toast.error(notify.Notify_Recapcha_Error());
+        // nếu không thì điều hướng
         else {
             try {
                 saveItem(u)
@@ -77,7 +90,7 @@ function Register() {
                     return toast.error(res.userMsg);
                 });
             } catch (error) {
-                return toast.error("Hệ thống đang có vấn đề! Vui lòng liên hệ Dương để được trợ giúp!");
+                return toast.error(notify.Notify_Eror_500());
             }
         }
     }
@@ -147,7 +160,7 @@ function Register() {
                         />
                         <ReCAPTCHA width="254px"
                             sitekey="6LfloT4dAAAAAOUmFQt7JQm07ViyI482cZlNAvKG"
-                            onChange={autholizeCapcha}
+                            onChange={capcha = true}
                         />
                         <Button primary onClick={() => Register(user)}>Đăng ký</Button>
                     </FormLayout>
@@ -158,8 +171,5 @@ function Register() {
         </Page>
     )
 }
-
-
-
 
 export default Register;
